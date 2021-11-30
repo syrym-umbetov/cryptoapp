@@ -7,6 +7,7 @@ import { MoneyCollectOutlined, DollarCircleOutlined, FundOutlined, ExclamationCi
 
 import { useGetCryptoDetailsQuery, useGetCryptoHistoryQuery } from '../services/cryptoApi';
 import Loader from './Loader';
+import LineChart from './LineChart';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
@@ -14,9 +15,9 @@ const { Option } = Select;
 const CryptoDetails = () => {
     const { coinId } = useParams();
     
-    const [ timeperiod, setTimePeriod] = useState('7d')
+    const [ timePeriod, setTimePeriod] = useState('7d')
     const { data, isFetching } = useGetCryptoDetailsQuery(coinId)
-    const { data: coinHistory } = useGetCryptoHistoryQuery({ coinId, timeperiod });
+    const { data: coinHistory } = useGetCryptoHistoryQuery({ coinId, timePeriod });
     const cryptoDetails = data?.data?.coin;
     
     if (isFetching) return <Loader />;
@@ -44,29 +45,26 @@ const CryptoDetails = () => {
     }
 
     return (
-        <Col className="coin-detail-container">
-            {cryptoDetails && (
-                <>
-                    <Col className="coin-heading-container">
-                        <Title level={2} className="coin-name">
-                            {cryptoDetails.name} ({cryptoDetails.slug}) Price
-                        </Title>
-                
-                        <p>
-                            {cryptoDetails.name} live price in US dollars.
-                            View value statistics, market cap and supply.
-                        </p>
-                    </Col>
-                </>
-            )}
+        <Col className="coin-detail-container">         
+            <Col className="coin-heading-container">
+                <Title level={2} className="coin-name">
+                    {cryptoDetails.name} ({cryptoDetails.slug}) Price
+                </Title>
+        
+                <p>
+                    {cryptoDetails.name} live price in US dollars.
+                    View value statistics, market cap and supply.
+                </p>
+            </Col>                           
            <Select
                 defaultValue="7d" 
-                className="select-timerperiod" 
-                placeholder="Select Time Period" 
+                className="select-timeperiod" 
+                placeholder="Select TimePeriod" 
                 onChange={(value) => setTimePeriod(value)}                  
             >
                 {time.map((item) => <Option key={item}>{item}</Option>)}
             </Select>
+            <LineChart coinHistory={coinHistory} currentPrice={millify(cryptoDetails.price)} coinName={cryptoDetails.name} />            
             <Col className="stats-container">
                 <Col className="coin-value-statistics">
                     <Col className="coin-value-statistics-heading">
